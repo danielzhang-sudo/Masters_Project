@@ -2,7 +2,7 @@
 import random
 import argparse  
 import numpy as np 
-import torch
+import torch # type: ignore
 
 from lora import run_lora
 

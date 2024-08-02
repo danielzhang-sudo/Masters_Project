@@ -3,6 +3,7 @@ import torch.nn.functional as F # type: ignore
 import matplotlib.pyplot as plt # type: ignore
 
 from utils import *
+from utils import EarlyStopper
 
 from loralib.utils import mark_only_lora_as_trainable, apply_lora, get_lora_parameters, lora_state_dict, save_lora, load_lora
 from loralib import layers as lora_layers
@@ -142,8 +143,8 @@ def run_lora(args, clip_model, logit_scale, dataset, train_loader, val_loader, t
         if count_iters < total_iters:
             acc_train /= tot_samples
             loss_epoch /= tot_samples
-            current_lr = scheduler.get_last_lr()[0]
-            print('LR: {:.6f}, Acc: {:.4f}, Loss: {:.4f}'.format(current_lr, acc_train, loss_epoch))
+            # current_lr = scheduler.get_last_lr()[0]
+            print('Acc: {:.4f}, Loss: {:.4f}'.format(acc_train, loss_epoch))
             train_acc_list.append(acc_train)
             loss_train_list.append(loss_epoch)
 

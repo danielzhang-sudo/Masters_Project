@@ -1,6 +1,30 @@
-from tqdm import tqdm
-import torch
+from tqdm import tqdm # type: ignore
+import torch # type: ignore
 import clip
+from loralib.utils import save_lora, save_weights
+import matplotlib.pyplot as plt # type: ignore
+
+class EarlyStopper():
+    def __init__(self, patience=5, min_delta=0, list_lora_layers=None, args=None):
+        self.patience = patience
+        self.min_delta = min_delta
+        self.counter = 0
+        self.min_val_loss = float('inf')
+        self.args = args
+        self.lora_weigths, self.save_path = save_lora(args, list_lora_layers, save_true=False)
+
+    def early_stop(self, val_loss, epoch):
+        if val_loss < self.min_val_loss:
+            self.min_val_loss = val_loss
+            self.counter = 0
+        elif val_loss > (self.min_val_loss + self.min_delta):
+            self.counter += 1
+            print(f'Val loss greater: {self.counter}')
+            if self.counter >= self.patience:
+                if self.args.save_path != None:
+                    save_weights(self.lora_weigths, self.save_path+f'_{epoch}')
+                return True
+        return False
 
 def cls_acc(output, target, topk=1):
     pred = output.topk(topk, 1, True, True)[1].t()

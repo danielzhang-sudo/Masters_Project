@@ -4,16 +4,16 @@ import urllib
 import warnings
 from typing import Any, Union, List
 
-import torch
-from PIL import Image
-from torchvision.transforms import Compose, Resize, CenterCrop, ToTensor, Normalize
-from tqdm import tqdm
+import torch # type: ignore
+from PIL import Image # type: ignore
+from torchvision.transforms import Compose, Resize, CenterCrop, ToTensor, Normalize # type: ignore
+from tqdm import tqdm # type: ignore
 
 from .model import build_model
 from .simple_tokenizer import SimpleTokenizer as _Tokenizer
 
 try:
-    from torchvision.transforms import InterpolationMode
+    from torchvision.transforms import InterpolationMode # type: ignore
     BICUBIC = InterpolationMode.BICUBIC
     NEAREST = InterpolationMode.NEAREST
 except ImportError:

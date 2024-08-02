@@ -1,5 +1,5 @@
-import torch
-import torchvision.transforms as transforms
+import torch # type: ignore
+import torchvision.transforms as transforms # type: ignore
 import clip
 from datasets import build_dataset
 from datasets.utils import build_data_loader

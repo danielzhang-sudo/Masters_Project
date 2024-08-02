@@ -1,6 +1,6 @@
 import random
 import json
-import pandas as pd
+import pandas as pd # type: ignore
 
 def get_class_label(clas):
     return 0 if str(clas) == 'Charged Off' else 1
