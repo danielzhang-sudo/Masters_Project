@@ -1,7 +1,7 @@
 import os
 
-import torch
-import torch.nn as nn
+import torch # type: ignore
+import torch.nn as nn # type: ignore
 
 from typing import Dict
 
@@ -137,7 +137,7 @@ def apply_lora(args, clip_model):
     return list_lora_layers
 
 
-def save_lora(args, list_lora_layers):
+def save_lora(args, list_lora_layers, save_true):
     weights = {}
     for i, layer in enumerate(list_lora_layers):
         layer_weights = {}
@@ -183,8 +183,18 @@ def save_lora(args, list_lora_layers):
     os.makedirs(save_dir, exist_ok=True)
 
     save_path = f'{save_dir}/{args.filename}.pt'
-    torch.save(save_data, save_path)
-    print(f'LoRA weights saved to {save_path}')
+    # torch.save(save_data, save_path)
+    if save_true:
+        if args.save_path != None:
+            save_weights(save_data, save_path)
+        return None, None
+    else:
+        return save_data, save_path
+
+
+def save_weights(data, path):
+    torch.save(data, path)
+    print(f'LoRA weights saved to {path}')
 
 
 def load_lora(args, list_lora_layers):
