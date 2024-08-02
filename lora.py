@@ -1,5 +1,6 @@
 import torch
 import torch.nn.functional as F
+import matplotlib.pyplot as plt
 
 from utils import *
 
@@ -18,6 +19,7 @@ def evaluate_lora(args, clip_model, loader, dataset):
 
     acc = 0.
     tot_samples = 0
+    loss_epoch = 0.
     with torch.no_grad():
         for i, (images, target) in enumerate(loader):
             images, target = images.cuda(), target.cuda()
@@ -25,16 +27,19 @@ def evaluate_lora(args, clip_model, loader, dataset):
                 image_features = clip_model.encode_image(images)
             image_features = image_features/image_features.norm(dim=-1, keepdim=True)
             cosine_similarity = image_features @ text_features.t()
+            loss = F.cross_entropy(cosine_similarity, target)
             acc += cls_acc(cosine_similarity, target) * len(cosine_similarity)
+            loss_epoch += loss.item() * len(cosine_similarity)
             tot_samples += len(cosine_similarity)
     acc /= tot_samples
+    loss_epoch /= tot_samples
 
-    return acc
+    return acc, loss_epoch
 
 
 def run_lora(args, clip_model, logit_scale, dataset, train_loader, val_loader, test_loader):
     
-    VALIDATION = False
+    VALIDATION = True
     
     # Textual features
     print("\nGetting textual features as CLIP's classifier.")
@@ -82,11 +87,18 @@ def run_lora(args, clip_model, logit_scale, dataset, train_loader, val_loader, t
     scaler = torch.cuda.amp.GradScaler()
     count_iters = 0
     finish = False
+
+    train_acc_list = []
+    val_acc_list = []
+    loss_train_list = []
+    loss_val_list = []
+
     while count_iters < total_iters:
         clip_model.train()
         acc_train = 0
         tot_samples = 0
         loss_epoch = 0.
+        loss_epoch_val = 0.
         if args.encoder == 'vision': 
             text_features = textual_features.t().half()
         for i, (images, target) in enumerate(tqdm(train_loader)):
@@ -131,20 +143,48 @@ def run_lora(args, clip_model, logit_scale, dataset, train_loader, val_loader, t
             loss_epoch /= tot_samples
             current_lr = scheduler.get_last_lr()[0]
             print('LR: {:.6f}, Acc: {:.4f}, Loss: {:.4f}'.format(current_lr, acc_train, loss_epoch))
+            train_acc_list.append(acc_train)
+            loss_train_list.append(loss_epoch)
 
         
         # Eval
         if VALIDATION:
             clip_model.eval()
-            acc_val = evaluate_lora(args, clip_model, val_loader, dataset)
-            print("**** Val accuracy: {:.2f}. ****\n".format(acc_val))
+            acc_val, loss_epoch_val = evaluate_lora(args, clip_model, val_loader, dataset)
+            print("**** Val accuracy: {:.2f}, val loss: {:.2f}. ****\n".format(acc_val, loss_epoch_val))
+            val_acc_list.append(acc_val)
+            loss_val_list.append(loss_epoch_val)
         
     
-    acc_test = evaluate_lora(args, clip_model, test_loader, dataset)
-    print("**** Final test accuracy: {:.2f}. ****\n".format(acc_test))
+    acc_test, loss_test = evaluate_lora(args, clip_model, test_loader, dataset)
+    print("**** Final test accuracy: {:.2f}, test loss: {:.2f}. ****\n".format(acc_test, loss_test))
     
     if args.save_path != None:
         save_lora(args, list_lora_layers)
+
+        # Create the accuracy plot
+        plt.figure(figsize=(10, 5))
+        plt.plot(train_acc_list, 'b-', label='Training Accuracy')
+        plt.plot(val_acc_list, 'r-', label='Validation Accuracy')
+        plt.title('Training and Validation Accuracy')
+        plt.xlabel('Epochs')
+        plt.ylabel('Accuracy')
+        plt.legend()
+        plt.grid(True)
+        plt.savefig('figures/accuracy_plot.png')
+        plt.close()
+
+        # Create the loss plot
+        plt.figure(figsize=(10, 5))
+        plt.plot(loss_train_list, 'b-', label='Training Loss')
+        plt.plot(loss_val_list, 'r-', label='Validation Loss')
+        plt.title('Training and Validation Loss')
+        plt.xlabel('Epochs')
+        plt.ylabel('Loss')
+        plt.legend()
+        plt.grid(True)
+        plt.savefig('figures/loss_plot.png')
+        plt.close()
     return
             
     
