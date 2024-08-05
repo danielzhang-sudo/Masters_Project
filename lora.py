@@ -169,29 +169,29 @@ def run_lora(args, clip_model, logit_scale, dataset, train_loader, val_loader, t
     if args.save_path != None:
         _; _ = save_lora(args, list_lora_layers)
 
-        # Create the accuracy plot
-        plt.figure(figsize=(10, 5))
-        plt.plot(train_acc_list, 'b-', label='Training Accuracy')
-        plt.plot(val_acc_list, 'r-', label='Validation Accuracy')
-        plt.title('Training and Validation Accuracy')
-        plt.xlabel('Epochs')
-        plt.ylabel('Accuracy')
-        plt.legend()
-        plt.grid(True)
-        plt.savefig('figures/accuracy_plot.png')
-        plt.close()
+    # Create the accuracy plot
+    plt.figure(figsize=(10, 5))
+    plt.plot(train_acc_list, 'b-', label='Training Accuracy')
+    plt.plot(val_acc_list, 'r-', label='Validation Accuracy')
+    plt.title('Training and Validation Accuracy')
+    plt.xlabel('Epochs')
+    plt.ylabel('Accuracy')
+    plt.legend()
+    plt.grid(True)
+    plt.savefig('figures/accuracy_plot.png')
+    plt.close()
 
-        # Create the loss plot
-        plt.figure(figsize=(10, 5))
-        plt.plot(loss_train_list, 'b-', label='Training Loss')
-        plt.plot(loss_val_list, 'r-', label='Validation Loss')
-        plt.title('Training and Validation Loss')
-        plt.xlabel('Epochs')
-        plt.ylabel('Loss')
-        plt.legend()
-        plt.grid(True)
-        plt.savefig('figures/loss_plot.png')
-        plt.close()
+    # Create the loss plot
+    plt.figure(figsize=(10, 5))
+    plt.plot(loss_train_list, 'b-', label='Training Loss')
+    plt.plot(loss_val_list, 'r-', label='Validation Loss')
+    plt.title('Training and Validation Loss')
+    plt.xlabel('Epochs')
+    plt.ylabel('Loss')
+    plt.legend()
+    plt.grid(True)
+    plt.savefig('figures/loss_plot.png')
+    plt.close()
     return
             
     
