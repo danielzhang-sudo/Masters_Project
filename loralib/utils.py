@@ -180,12 +180,12 @@ def save_lora(args, list_lora_layers, save_true):
     # to manage names like ViT-B/16
     backbone = args.backbone.replace('/', '').replace('-', '').lower()
     save_dir = f'{args.save_path}/{backbone}/{args.dataset}/{args.shots}shots/seed{args.seed}'
-    os.makedirs(save_dir, exist_ok=True)
 
     save_path = f'{save_dir}/{args.filename}.pt'
     # torch.save(save_data, save_path)
     if save_true:
         if args.save_path != None:
+            os.makedirs(save_dir, exist_ok=True)
             save_weights(save_data, save_path)
         return None, None
     else:

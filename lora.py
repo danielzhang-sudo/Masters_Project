@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt # type: ignore
 from utils import *
 from utils import EarlyStopper
 
-from loralib.utils import mark_only_lora_as_trainable, apply_lora, get_lora_parameters, lora_state_dict, save_lora, load_lora
+from loralib.utils import mark_only_lora_as_trainable, apply_lora, get_lora_parameters, lora_state_dict, save_lora, save_weights, load_lora
 from loralib import layers as lora_layers
 
 def evaluate_lora(args, clip_model, loader, dataset):
@@ -167,7 +167,8 @@ def run_lora(args, clip_model, logit_scale, dataset, train_loader, val_loader, t
     print("**** Final test accuracy: {:.2f}, test loss: {:.2f}. ****\n".format(acc_test, loss_test))
     
     if args.save_path != None:
-        _; _ = save_lora(args, list_lora_layers)
+        data, path = save_lora(args, list_lora_layers)
+        save_weights(data, path)
 
     # Create the accuracy plot
     plt.figure(figsize=(10, 5))
