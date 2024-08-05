@@ -1,4 +1,6 @@
 import os
+import pandas as pd # type: ignore
+from sklearn.model_selection import train_test_split # type: ignore
 
 from .utils import Datum, DatasetBase, read_json, write_json, build_data_loader
 
@@ -17,12 +19,25 @@ def read_split(filepath, path_prefix):
             )
             out.append(item)
         return out
+
+    def get_class_label(clas):
+        return 0 if str(clas) == 'Charged Off' else 1
     
     print(f'Reading split from {filepath}')
-    split = read_json(filepath)
-    train = _convert(split['train'])
-    val = _convert(split['val'])
-    test = _convert(split['test'])
+    df = pd.read_csv(filepath)
+    items = []
+    
+    for idx, row in df.iterrows():
+        impath = f"{idx}.jpg"
+        label = get_class_label(row['loan_status'])
+        items.append((impath, label, row['loan_status']))
+
+    train_items, temp_items = train_test_split(items, test_size=0.4, random_state=42)
+    val_items, test_items = train_test_split(temp_items, test_size=0.5, random_state=42)
+    
+    train = _convert(train_items)
+    val = _convert(val_items)
+    test = _convert(test_items)
 
     return train, val, test
 
