@@ -5,46 +5,26 @@ from loralib.utils import save_lora, save_weights
 import matplotlib.pyplot as plt # type: ignore
 
 class EarlyStopper():
-    def __init__(self, patience=5, min_delta=0, list_lora_layers=None, args=None):
+    def __init__(self, patience=10, min_delta=0, list_lora_layers=None, args=None):
         self.patience = patience
         self.min_delta = min_delta
         self.counter = 0
         self.min_val_loss = float('inf')
         self.args = args
-        self.lora_weigths, self.save_path = save_lora(args, list_lora_layers, save_true=False)
+        self.list_lora_layers = list_lora_layers
+        # self.lora_weigths, self.save_path = save_lora(args, list_lora_layers, save_true=False)
 
     def early_stop(self, val_loss, epoch):
         if val_loss < self.min_val_loss:
+            print('Val loss less')
             self.min_val_loss = val_loss
             self.counter = 0
         elif val_loss > (self.min_val_loss + self.min_delta):
             self.counter += 1
-            print(f'Val loss greater: {self.counter}')
+            print(f'Val loss greater: {epoch}')
             if self.counter >= self.patience:
-                if self.args.save_path != None:
-                    save_weights(self.lora_weigths, self.save_path+f'_{epoch}')
-                return True
-        return False
-
-class EarlyStopper():
-    def __init__(self, patience=5, min_delta=0, list_lora_layers=None, args=None):
-        self.patience = patience
-        self.min_delta = min_delta
-        self.counter = 0
-        self.min_val_loss = float('inf')
-        self.args = args
-        self.lora_weigths, self.save_path = save_lora(args, list_lora_layers, save_true=False)
-
-    def early_stop(self, val_loss, epoch):
-        if val_loss < self.min_val_loss:
-            self.min_val_loss = val_loss
-            self.counter = 0
-        elif val_loss > (self.min_val_loss + self.min_delta):
-            self.counter += 1
-            print(f'Val loss greater: {self.counter}')
-            if self.counter >= self.patience:
-                if self.args.save_path != None:
-                    save_weights(self.lora_weigths, self.save_path+f'_{epoch}')
+                # if self.args.save_path != None:
+                #     _, _ = save_lora(self.args, self.list_lora_layers, save_true=True)
                 return True
         return False
 

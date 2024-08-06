@@ -79,8 +79,9 @@ def run_lora(args, clip_model, logit_scale, dataset, train_loader, val_loader, t
     total_iters = args.n_iters * args.shots
     
     optimizer = torch.optim.AdamW(get_lora_parameters(clip_model), weight_decay=1e-2, betas=(0.9, 0.999), lr=args.lr)
-    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=3)
-    early_stopper = EarlyStopper(patience=5, min_delta=0, list_lora_layers=list_lora_layers, args=args)
+    # scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=3)
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, total_iters, eta_min=1e-6)
+    early_stopper = EarlyStopper(patience=10, min_delta=0, list_lora_layers=list_lora_layers, args=args)
     
     best_acc_val, best_acc_test = 0., 0.
     best_epoch_val = 0
@@ -167,8 +168,8 @@ def run_lora(args, clip_model, logit_scale, dataset, train_loader, val_loader, t
     print("**** Final test accuracy: {:.2f}, test loss: {:.2f}. ****\n".format(acc_test, loss_test))
     
     if args.save_path != None:
-        data, path = save_lora(args, list_lora_layers)
-        save_weights(data, path)
+        _, _ = save_lora(args, list_lora_layers, True)
+        # save_weights(data, path)
 
     # Create the accuracy plot
     plt.figure(figsize=(10, 5))

@@ -36,7 +36,7 @@ def get_arguments():
     parser.add_argument('--alpha', default=1, type=int, help='scaling (see LoRA paper)')
     parser.add_argument('--dropout_rate', default=0.25, type=float, help='dropout rate applied before the LoRA module')
     
-    parser.add_argument('--save_path', default=None, help='path to save the lora modules after training, not saved if None')
+    parser.add_argument('--save_path', default='weights', help='path to save the lora modules after training, not saved if None')
     parser.add_argument('--filename', default='lora_weights', help='file name to save the lora weights (.pt extension will be added)')
     
     parser.add_argument('--eval_only', default=False, action='store_true', help='only evaluate the LoRA modules (save_path should not be None)')

@@ -28,7 +28,7 @@ def read_split(filepath, path_prefix):
     items = []
     
     for idx, row in df.iterrows():
-        impath = f"{idx}.jpg"
+        impath = f"{idx}.png"
         label = get_class_label(row['loan_status'])
         items.append((impath, label, row['loan_status']))
 
@@ -48,7 +48,7 @@ class Credit(DatasetBase):
     def __init__(self, root, num_shots):
         self.dataset_dir = os.path.join(root, self.dataset_dir)
         self.image_dir = os.path.join(self.dataset_dir, 'images')
-        self.split_path = os.path.join(self.dataset_dir, 'split_Credit.json')
+        self.split_path = os.path.join(self.dataset_dir, 'captions_classes_dataset.csv')
         
         self.template = template
 
