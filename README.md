@@ -24,18 +24,18 @@ Masters_Project/
 
 Then execute:
 
-`python deng_prep.py`
-`python ours_prep.py` 
-`python german_aus.py`
+```python deng_prep.py```
+```python ours_prep.py``` 
+```python german_aus.py```
 
 to create the image datasets.
 
 To run the model:
 
-`python main.py --dataset credit`
+```python main.py --dataset credit```
 
 To finetune the model:
 
-`python main.py --finetune --dataset credit --encoder both --position all --dropout_rate 0.25`
+```python main.py --finetune --dataset credit --encoder both --position all --dropout_rate 0.25```
 
 You can adjust the arguments given to change the dataset or the model configurations.
