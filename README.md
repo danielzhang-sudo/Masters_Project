@@ -25,7 +25,9 @@ Masters_Project/
 Then execute:
 
 ```python deng_prep.py```
-```python ours_prep.py``` 
+or
+```python ours_prep.py```
+or
 ```python german_aus.py```
 
 to create the image datasets.
