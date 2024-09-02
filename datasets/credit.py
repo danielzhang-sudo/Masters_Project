@@ -5,8 +5,8 @@ from sklearn.model_selection import train_test_split # type: ignore
 from .utils import Datum, DatasetBase, read_json, write_json, build_data_loader
 
 
-# template = ['a photo representing information about a customer\'s financial credit risk indicators that {} the loan.']
-template = ['a photo of a {} loan.']
+template = ['a photo representing information about a customer\'s financial credit risk indicators that {} the loan.']
+# template = ['a photo of a {} loan.']
 
 def read_split(filepath, path_prefix):
     def _convert(items):
