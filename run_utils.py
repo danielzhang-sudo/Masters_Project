@@ -25,7 +25,7 @@ def get_arguments():
     # Model arguments
     parser.add_argument('--backbone', default='ViT-B/16', type=str)
     # Training arguments
-    parser.add_argument('--lr', default=2e-4, type=float)
+    parser.add_argument('--lr', default=2e-3, type=float)
     parser.add_argument('--n_iters', default=100, type=int)
     parser.add_argument('--batch_size', default=32, type=int)
     # LoRA arguments
@@ -40,6 +40,7 @@ def get_arguments():
     parser.add_argument('--filename', default='lora_weights', help='file name to save the lora weights (.pt extension will be added)')
     
     parser.add_argument('--eval_only', default=False, action='store_true', help='only evaluate the LoRA modules (save_path should not be None)')
+    parser.add_argument('--finetune', default=False, action='store_true', help='finetune model with LoRA, else only does zero-shot evaluation')
     args = parser.parse_args()
 
     return args

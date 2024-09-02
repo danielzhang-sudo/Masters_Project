@@ -77,6 +77,7 @@ def _convert_image_to_rgb(image):
 
 def _transform(n_px):
     return Compose([
+        # Resize(n_px, interpolation=BICUBIC),
         Resize((n_px, n_px), interpolation=BICUBIC),
         # CenterCrop(n_px),
         _convert_image_to_rgb,
