@@ -119,106 +119,109 @@ def table2image(df, path):
         plt.savefig(f'{path}/{index}.png', bbox_inches='tight', dpi=100)
         plt.close(fig)  # Close the figure to avoid displaying it in interactive environments
 
+def germanaus_prep():
+    statlog_german_credit_data = fetch_ucirepo(id=144)
+    X_german = statlog_german_credit_data.data.features
+    y_german = statlog_german_credit_data.data.targets
 
-statlog_german_credit_data = fetch_ucirepo(id=144)
-X_german = statlog_german_credit_data.data.features
-y_german = statlog_german_credit_data.data.targets
+    german = pd.DataFrame(X_german)
+    german_col = list(statlog_german_credit_data.variables.description)[:20]
+    german.columns = german_col
 
-german = pd.DataFrame(X_german)
-german_col = list(statlog_german_credit_data.variables.description)[:20]
-german.columns = german_col
+    new_german = replace_attribute_codes(german)
 
-new_german = replace_attribute_codes(german)
+    new_german['Status of existing checking account'] = pd.Categorical(
+        list(new_german['Status of existing checking account'])).codes
+    new_german['Credit history'] = pd.Categorical(
+        list(new_german['Credit history'])).codes
+    new_german['Savings account/bonds'] = pd.Categorical(
+        list(new_german['Savings account/bonds'])).codes
+    new_german['Present employment since'] = pd.Categorical(
+        list(new_german['Present employment since'])).codes
 
-new_german['Status of existing checking account'] = pd.Categorical(
-    list(new_german['Status of existing checking account'])).codes
-new_german['Credit history'] = pd.Categorical(
-    list(new_german['Credit history'])).codes
-new_german['Savings account/bonds'] = pd.Categorical(
-    list(new_german['Savings account/bonds'])).codes
-new_german['Present employment since'] = pd.Categorical(
-    list(new_german['Present employment since'])).codes
+    colll = ['Purpose', 'Personal status and sex', 
+            'Other debtors / guarantors', 'Property', 
+            'Other installment plans', 'Housing', 
+            'Job', 'Telephone', 'foreign worker']
 
-colll = ['Purpose', 'Personal status and sex', 
-         'Other debtors / guarantors', 'Property', 
-         'Other installment plans', 'Housing', 
-         'Job', 'Telephone', 'foreign worker']
+    cols = [col for col in new_german.columns if col not in colll]
+    for column in cols: 
+        new_german[column] = (new_german[column] -
+                            new_german[column].mean()) / new_german[column].std()
 
-cols = [col for col in new_german.columns if col not in colll]
-for column in cols: 
-    new_german[column] = (new_german[column] -
-                        new_german[column].mean()) / new_german[column].std()
+    new_german = pd.get_dummies(new_german, columns=['Purpose', 
+                        'Personal status and sex', 'Other debtors / guarantors', 
+                        'Property', 'Other installment plans', 'Housing', 
+                        'Job', 'Telephone', 'foreign worker'], dtype=int)
 
-new_german = pd.get_dummies(new_german, columns=['Purpose', 
-                    'Personal status and sex', 'Other debtors / guarantors', 
-                    'Property', 'Other installment plans', 'Housing', 
-                    'Job', 'Telephone', 'foreign worker'], dtype=int)
+    new_german['padding_1'] = 0
+    new_german['padding_2'] = 0
 
-new_german['padding_1'] = 0
-new_german['padding_2'] = 0
+    new_german = new_german[['padding_1', 'padding_2', 
+        'Status of existing checking account', 'Duration', 'Credit history',
+        'Credit amount', 'Savings account/bonds', 'Present employment since',
+        'Installment rate in percentage of disposable income',
+        'Present residence since', 'Age',
+        'Number of existing credits at this bank',
+        'Number of people being liable to provide maintenance for',
+        'Purpose_business', 'Purpose_car (new)', 'Purpose_car (used)',
+        'Purpose_domestic appliances', 'Purpose_education',
+        'Purpose_furniture/equipment', 'Purpose_others',
+        'Purpose_radio/television', 'Purpose_repairs', 'Purpose_retraining',
+        'Personal status and sex_female : divorced/separated/married',
+        'Personal status and sex_male : divorced/separated',
+        'Personal status and sex_male : married/widowed',
+        'Personal status and sex_male : single',
+        'Other debtors / guarantors_co-applicant',
+        'Other debtors / guarantors_guarantor',
+        'Other debtors / guarantors_none',
+        'Property_building society savings agreement/ life insurance',
+        'Property_car or other, not in attribute 6', 'Property_real estate',
+        'Property_unknown / no property', 'Other installment plans_bank',
+        'Other installment plans_none', 'Other installment plans_stores',
+        'Housing_for free', 'Housing_own', 'Housing_rent',
+        'Job_management/ self-employed/ highly qualified employee/ officer',
+        'Job_skilled employee / official',
+        'Job_unemployed/ unskilled - non-resident', 'Job_unskilled - resident',
+        'Telephone_none', 'Telephone_yes, registered under the customers name',
+        'foreign worker_no', 'foreign worker_yes']]
 
-new_german = new_german[['padding_1', 'padding_2', 
-       'Status of existing checking account', 'Duration', 'Credit history',
-       'Credit amount', 'Savings account/bonds', 'Present employment since',
-       'Installment rate in percentage of disposable income',
-       'Present residence since', 'Age',
-       'Number of existing credits at this bank',
-       'Number of people being liable to provide maintenance for',
-       'Purpose_business', 'Purpose_car (new)', 'Purpose_car (used)',
-       'Purpose_domestic appliances', 'Purpose_education',
-       'Purpose_furniture/equipment', 'Purpose_others',
-       'Purpose_radio/television', 'Purpose_repairs', 'Purpose_retraining',
-       'Personal status and sex_female : divorced/separated/married',
-       'Personal status and sex_male : divorced/separated',
-       'Personal status and sex_male : married/widowed',
-       'Personal status and sex_male : single',
-       'Other debtors / guarantors_co-applicant',
-       'Other debtors / guarantors_guarantor',
-       'Other debtors / guarantors_none',
-       'Property_building society savings agreement/ life insurance',
-       'Property_car or other, not in attribute 6', 'Property_real estate',
-       'Property_unknown / no property', 'Other installment plans_bank',
-       'Other installment plans_none', 'Other installment plans_stores',
-       'Housing_for free', 'Housing_own', 'Housing_rent',
-       'Job_management/ self-employed/ highly qualified employee/ officer',
-       'Job_skilled employee / official',
-       'Job_unemployed/ unskilled - non-resident', 'Job_unskilled - resident',
-       'Telephone_none', 'Telephone_yes, registered under the customers name',
-       'foreign worker_no', 'foreign worker_yes']]
+    table_to_image(new_german, 'CREDIT/german/german_ours', 8, 6)
+    table_german = replace_attribute_codes(german)
+    table2image(table_german)
 
-table_to_image(new_german, 'CREDIT/german/german_ours', 8, 6)
-table_german = replace_attribute_codes(german)
-table2image(table_german)
+    # australian dataset
+    statlog_australian_credit_approval = fetch_ucirepo(id=143)
+    X_aus = statlog_australian_credit_approval.data.features 
+    y_aus = statlog_australian_credit_approval.data.targets
 
-# australian dataset
-statlog_australian_credit_approval = fetch_ucirepo(id=143)
-X_aus = statlog_australian_credit_approval.data.features 
-y_aus = statlog_australian_credit_approval.data.targets
+    aus_2 = pd.DataFrame(X_aus)
+    df_aus = aus_2.copy()
 
-aus_2 = pd.DataFrame(X_aus)
-df_aus = aus_2.copy()
+    aus_2 = pd.get_dummies(aus_2, columns=['A4','A5','A6','A12'], dtype=int)
 
-aus_2 = pd.get_dummies(aus_2, columns=['A4','A5','A6','A12'], dtype=int)
+    norm_col = ['A2', 'A3', 'A7', 'A10', 'A13', 'A14']
 
-norm_col = ['A2', 'A3', 'A7', 'A10', 'A13', 'A14']
+    for column in norm_col: 
+        aus_2[column] = (aus_2[column] -
+                            aus_2[column].mean()) / aus_2[column].std()
+        
+    aus_2['padding_1'] = 0
+    aus_2['padding_2'] = 0
 
-for column in norm_col: 
-    aus_2[column] = (aus_2[column] -
-                        aus_2[column].mean()) / aus_2[column].std()
-    
-aus_2['padding_1'] = 0
-aus_2['padding_2'] = 0
+    aus_2 = aus_2[['padding_1', 'padding_2', 'A1', 'A2', 'A3', 'A7', 
+                'A8', 'A9', 'A10', 'A11', 'A13', 'A14', 'A4_1',
+                'A4_2', 'A4_3', 'A5_1', 'A5_2', 'A5_3', 'A5_4', 
+                'A5_5', 'A5_6', 'A5_7', 'A5_8', 'A5_9', 'A5_10', 
+                'A5_11', 'A5_12', 'A5_13', 'A5_14', 'A6_1',
+                'A6_2', 'A6_3', 'A6_4', 'A6_5', 'A6_7', 'A6_8', 
+                'A6_9', 'A12_1', 'A12_2', 'A12_3']]
 
-aus_2 = aus_2[['padding_1', 'padding_2', 'A1', 'A2', 'A3', 'A7', 
-               'A8', 'A9', 'A10', 'A11', 'A13', 'A14', 'A4_1',
-               'A4_2', 'A4_3', 'A5_1', 'A5_2', 'A5_3', 'A5_4', 
-               'A5_5', 'A5_6', 'A5_7', 'A5_8', 'A5_9', 'A5_10', 
-               'A5_11', 'A5_12', 'A5_13', 'A5_14', 'A6_1',
-               'A6_2', 'A6_3', 'A6_4', 'A6_5', 'A6_7', 'A6_8', 
-               'A6_9', 'A12_1', 'A12_2', 'A12_3']]
+    table_to_image(aus_2, 'CREDIT/aus/aus_ours', 8, 5)
+    table2image(df_aus, 'CREDIT/aus_aus_deng')
 
-table_to_image(aus_2, 'CREDIT/aus/aus_ours', 8, 5)
-table2image(df_aus, 'CREDIT/aus_aus_deng')
+    y_german.to_csv('CREDIT/german/german_classes.csv', index=True)
+    y_aus.to_csv('CREDIT/aus/aus_classes.csv', index=True)
 
-y_german.to_csv('CREDIT/german/german_classes.csv', index=True)
-y_aus.to_csv('CREDIT/aus/aus_classes.csv', index=True)
+if __name__=='__main__':
+    germanaus_prep()

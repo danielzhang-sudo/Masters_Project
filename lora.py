@@ -5,7 +5,9 @@ import matplotlib.pyplot as plt # type: ignore
 from utils import *
 from utils import EarlyStopper
 
-from loralib.utils import mark_only_lora_as_trainable, apply_lora, get_lora_parameters, lora_state_dict, save_lora, save_weights, load_lora
+from loralib.utils import mark_only_lora_as_trainable, apply_lora
+from loralib.utils import get_lora_parameters, lora_state_dict
+from loralib.utils import save_lora, save_weights, load_lora
 from loralib import layers as lora_layers
 
 def evaluate_lora(args, clip_model, loader, dataset):
@@ -87,14 +89,11 @@ def run_lora(args, clip_model, logit_scale, dataset, train_loader, val_loader, t
     zs_acc = cls_acc(clip_logits, test_labels)
     print("\n**** Zero-shot CLIP's test accuracy: {:.2f}. ****\n".format(zs_acc))
 
-    # metrics = cls_metrics(clip_logits, test_labels)
-    # print(f"\n**** Zero-shot CLIP's test metrics: \n{metrics}. ****\n")
-
     ext_metrics, confusion_matrix = extended_cls_metrics(clip_logits, test_labels)
     print(f"\n {args.dataset} \n**** Zero-shot CLIP's test extended metrics: \n{ext_metrics}. ****\n")
 
-    with open('out.txt', 'a') as f:
-        f.write(f"\n{args.dataset}\n**** Zero-shot CLIP's test extended metrics: \n{ext_metrics}. ****\n")
+    # with open('out.txt', 'a') as f:
+    #     f.write(f"\n{args.dataset}\n**** Zero-shot CLIP's test extended metrics: \n{ext_metrics}. ****\n")
 
     if not args.finetune:
         print('no fineune')
